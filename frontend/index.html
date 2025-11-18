@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Recruitment Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <i class="fas fa-brain text-blue-600 text-2xl mr-3"></i>
+                    <span class="text-xl font-bold text-gray-800">AI Recruitment Assistant</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="showSection('candidates')" class="nav-btn px-4 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+                        <i class="fas fa-users mr-2"></i>Candidates
+                    </button>
+                    <button onclick="showSection('jobs')" class="nav-btn px-4 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+                        <i class="fas fa-briefcase mr-2"></i>Jobs
+                    </button>
+                    <button onclick="showSection('interviews')" class="nav-btn px-4 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+                        <i class="fas fa-calendar-alt mr-2"></i>Interviews
+                    </button>
+                    <button onclick="showSection('ranking')" class="nav-btn px-4 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+                        <i class="fas fa-star mr-2"></i>Ranking
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Dashboard Section (Default) -->
+        <section id="dashboard-section" class="content-section">
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">Dashboard</h1>
+                <p class="text-gray-600">Welcome to your AI-powered recruitment platform</p>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm">Total Candidates</p>
+                            <p class="text-3xl font-bold text-gray-800" id="stat-candidates">0</p>
+                        </div>
+                        <i class="fas fa-users text-blue-500 text-3xl"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm">Active Jobs</p>
+                            <p class="text-3xl font-bold text-gray-800" id="stat-jobs">0</p>
+                        </div>
+                        <i class="fas fa-briefcase text-green-500 text-3xl"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-purple-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm">Interviews</p>
+                            <p class="text-3xl font-bold text-gray-800" id="stat-interviews">0</p>
+                        </div>
+                        <i class="fas fa-calendar-alt text-purple-500 text-3xl"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-orange-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm">Avg Score</p>
+                            <p class="text-3xl font-bold text-gray-800" id="stat-avg-score">-</p>
+                        </div>
+                        <i class="fas fa-star text-orange-500 text-3xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-8 rounded-lg shadow-lg text-white cursor-pointer hover:shadow-xl transition" onclick="showSection('candidates')">
+                    <i class="fas fa-upload text-5xl mb-4"></i>
+                    <h3 class="text-2xl font-bold mb-2">Upload Resume</h3>
+                    <p class="text-blue-100">Add a new candidate with AI-powered resume parsing</p>
+                </div>
+                <div class="bg-gradient-to-r from-green-500 to-green-600 p-8 rounded-lg shadow-lg text-white cursor-pointer hover:shadow-xl transition" onclick="showSection('jobs')">
+                    <i class="fas fa-plus-circle text-5xl mb-4"></i>
+                    <h3 class="text-2xl font-bold mb-2">Create Job</h3>
+                    <p class="text-green-100">Post a new job opening and find the best candidates</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Candidates Section -->
+        <section id="candidates-section" class="content-section hidden">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800 mb-2">Candidates</h1>
+                    <p class="text-gray-600">Manage and review candidate profiles</p>
+                </div>
+                <button onclick="showUploadModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg shadow-md transition flex items-center">
+                    <i class="fas fa-upload mr-2"></i>Upload Resume
+                </button>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="bg-white p-4 rounded-lg shadow-md mb-6">
+                <div class="flex gap-4">
+                    <div class="flex-1">
+                        <input type="text" id="candidate-search" placeholder="Search candidates by name or email..." 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <button onclick="searchCandidates()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Candidates List -->
+            <div id="candidates-list" class="grid grid-cols-1 gap-4">
+                <!-- Candidates will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Jobs Section -->
+        <section id="jobs-section" class="content-section hidden">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800 mb-2">Job Postings</h1>
+                    <p class="text-gray-600">Create and manage job openings</p>
+                </div>
+                <button onclick="showJobModal()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg shadow-md transition flex items-center">
+                    <i class="fas fa-plus mr-2"></i>Create Job
+                </button>
+            </div>
+
+            <!-- Jobs List -->
+            <div id="jobs-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Jobs will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Interviews Section -->
+        <section id="interviews-section" class="content-section hidden">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800 mb-2">Interviews</h1>
+                    <p class="text-gray-600">Schedule and manage interviews</p>
+                </div>
+                <button onclick="showInterviewModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg shadow-md transition flex items-center">
+                    <i class="fas fa-calendar-plus mr-2"></i>Schedule Interview
+                </button>
+            </div>
+
+            <!-- Filter Tabs -->
+            <div class="bg-white p-4 rounded-lg shadow-md mb-6">
+                <div class="flex gap-4">
+                    <button onclick="filterInterviews('all')" class="interview-filter-btn px-4 py-2 rounded-lg bg-purple-100 text-purple-700 font-medium">
+                        All Interviews
+                    </button>
+                    <button onclick="filterInterviews('upcoming')" class="interview-filter-btn px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100">
+                        Upcoming
+                    </button>
+                </div>
+            </div>
+
+            <!-- Interviews List -->
+            <div id="interviews-list" class="space-y-4">
+                <!-- Interviews will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Ranking Section -->
+        <section id="ranking-section" class="content-section hidden">
+            <div class="mb-6">
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">Candidate Ranking</h1>
+                <p class="text-gray-600">AI-powered candidate ranking for jobs</p>
+            </div>
+
+            <!-- Ranking Form -->
+            <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Select Job</label>
+                        <select id="rank-job-select" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="">Choose a job...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Select Candidate</label>
+                        <select id="rank-candidate-select" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="">Choose a candidate...</option>
+                        </select>
+                    </div>
+                </div>
+                <button onclick="rankCandidate()" class="mt-6 bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg shadow-md transition w-full">
+                    <i class="fas fa-star mr-2"></i>Rank Candidate
+                </button>
+            </div>
+
+            <!-- Ranking Result -->
+            <div id="ranking-result" class="hidden bg-white p-6 rounded-lg shadow-md">
+                <!-- Result will be shown here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Modals -->
+    <!-- Upload Resume Modal -->
+    <div id="upload-modal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gray-800">Upload Resume</h2>
+                    <button onclick="closeUploadModal()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <form id="upload-form" onsubmit="uploadResume(event)">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-medium mb-2">Candidate Name *</label>
+                        <input type="text" id="candidate-name" required 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-medium mb-2">Email</label>
+                        <input type="email" id="candidate-email" 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-medium mb-2">Phone</label>
+                        <input type="tel" id="candidate-phone" 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 font-medium mb-2">Resume File (PDF/DOC/DOCX) *</label>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-500 transition" 
+                             onclick="document.getElementById('resume-file').click()"
+                             ondragover="handleDragOver(event)"
+                             ondrop="handleDrop(event)">
+                            <i class="fas fa-cloud-upload-alt text-5xl text-gray-400 mb-4"></i>
+                            <p class="text-gray-600">Drag & drop your resume here or click to browse</p>
+                            <p class="text-sm text-gray-500 mt-2">Max size: 10MB</p>
+                            <input type="file" id="resume-file" accept=".pdf,.doc,.docx" required class="hidden">
+                            <p id="file-name" class="mt-4 text-blue-600 font-medium"></p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition">
+                            <i class="fas fa-upload mr-2"></i>Upload & Parse
+                        </button>
+                        <button type="button" onclick="closeUploadModal()" class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Job Modal -->
+    <div id="job-modal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gray-800">Create Job Posting</h2>
+                    <button onclick="closeJobModal()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <form id="job-form" onsubmit="createJob(event)">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-medium mb-2">Job Title *</label>
+                        <input type="text" id="job-title" required 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 font-medium mb-2">Job Description *</label>
+                        <textarea id="job-description" required rows="6"
+                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"></textarea>
+                    </div>
+                    <div class="flex gap-4">
+                        <button type="submit" class="flex-1 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition">
+                            <i class="fas fa-plus mr-2"></i>Create Job
+                        </button>
+                        <button type="button" onclick="closeJobModal()" class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schedule Interview Modal -->
+    <div id="interview-modal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gray-800">Schedule Interview</h2>
+                    <button onclick="closeInterviewModal()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <form id="interview-form" onsubmit="scheduleInterview(event)">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Candidate *</label>
+                            <select id="interview-candidate" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                                <option value="">Select candidate...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Job</label>
+                            <select id="interview-job" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                                <option value="">Select job (optional)...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Date & Time *</label>
+                            <input type="datetime-local" id="interview-datetime" required
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Interviewer</label>
+                            <input type="text" id="interview-interviewer" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 font-medium mb-2">Notes</label>
+                        <textarea id="interview-notes" rows="3"
+                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"></textarea>
+                    </div>
+                    <div class="flex gap-4">
+                        <button type="submit" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition">
+                            <i class="fas fa-calendar-check mr-2"></i>Schedule Interview
+                        </button>
+                        <button type="button" onclick="closeInterviewModal()" class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg shadow-xl">
+            <div class="flex items-center">
+                <i class="fas fa-spinner fa-spin text-blue-600 text-3xl mr-4"></i>
+                <span class="text-gray-800 text-lg">Processing...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed bottom-4 right-4 bg-white shadow-lg rounded-lg p-4 z-50 max-w-sm">
+        <div class="flex items-center">
+            <i id="toast-icon" class="text-2xl mr-3"></i>
+            <div>
+                <p id="toast-title" class="font-bold"></p>
+                <p id="toast-message" class="text-sm text-gray-600"></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
