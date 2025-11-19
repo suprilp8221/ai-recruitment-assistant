@@ -9,7 +9,7 @@ from typing import List, Optional
 from datetime import datetime
 from app.db.database import get_db
 from app import schemas
-from app.db import crud
+from app.db import crud, models
 from app.core.exceptions import (
     CandidateNotFoundException,
     JobNotFoundException,
@@ -18,6 +18,11 @@ from app.core.exceptions import (
     InvalidScheduleException
 )
 from app.core.logging_config import get_logger
+from app.core.auth_dependencies import (
+    get_current_user,
+    require_recruiter_or_admin,
+    require_interviewer_or_above
+)
 
 router = APIRouter()
 logger = get_logger(__name__)
@@ -26,7 +31,8 @@ logger = get_logger(__name__)
 @router.post("/interviews", response_model=schemas.InterviewOut, status_code=201)
 def create_interview(
     payload: schemas.InterviewCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(require_recruiter_or_admin)
 ):
     """
     Schedule a new interview.
@@ -77,7 +83,8 @@ def list_interviews(
     candidate_id: Optional[int] = None,
     job_id: Optional[int] = None,
     upcoming_only: bool = False,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(require_interviewer_or_above)
 ):
     """
     List all interviews with optional filters.
@@ -105,7 +112,11 @@ def list_interviews(
 
 
 @router.get("/interviews/{interview_id}", response_model=schemas.InterviewOut)
-def get_interview(interview_id: int, db: Session = Depends(get_db)):
+def get_interview(
+    interview_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(require_interviewer_or_above)
+):
     """Get specific interview by ID."""
     try:
         logger.debug(f"Fetching interview: {interview_id}")
@@ -126,7 +137,8 @@ def get_interview(interview_id: int, db: Session = Depends(get_db)):
 def update_interview(
     interview_id: int,
     payload: schemas.InterviewUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(require_recruiter_or_admin)
 ):
     """
     Update interview details.
@@ -155,7 +167,11 @@ def update_interview(
 
 
 @router.delete("/interviews/{interview_id}", status_code=204)
-def delete_interview(interview_id: int, db: Session = Depends(get_db)):
+def delete_interview(
+    interview_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(require_recruiter_or_admin)
+):
     """Cancel/delete an interview."""
     interview = crud.get_interview(db=db, interview_id=interview_id)
     if not interview:
@@ -169,7 +185,8 @@ def delete_interview(interview_id: int, db: Session = Depends(get_db)):
 def update_interview_notes(
     interview_id: int,
     payload: schemas.InterviewNotesUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(require_interviewer_or_above)
 ):
     """
     Add or update interview feedback/notes.
@@ -190,7 +207,8 @@ def update_interview_notes(
 @router.get("/candidates/{candidate_id}/interviews", response_model=List[schemas.InterviewOut])
 def get_candidate_interviews(
     candidate_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
 ):
     """Get all interviews for a specific candidate."""
     candidate = crud.get_candidate(db=db, candidate_id=candidate_id)
@@ -209,7 +227,8 @@ def get_candidate_interviews(
 @router.get("/jobs/{job_id}/interviews", response_model=List[schemas.InterviewOut])
 def get_job_interviews(
     job_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
 ):
     """Get all interviews scheduled for a specific job."""
     job = crud.get_job(db=db, job_id=job_id)

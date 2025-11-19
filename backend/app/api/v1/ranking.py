@@ -6,12 +6,18 @@ from app.db import crud, models
 from app.services import ranking as ranking_service
 from app.core.exceptions import JobNotFoundException, CandidateNotFoundException, AIServiceException, DatabaseException
 from app.core.logging_config import get_logger
+from app.core.auth_dependencies import require_recruiter_or_admin
 
 router = APIRouter()
 logger = get_logger(__name__)
 
 @router.post("/jobs/{job_id}/rank/{candidate_id}")
-def rank_candidate_endpoint(job_id: int, candidate_id: int, db: Session = Depends(get_db)):
+def rank_candidate_endpoint(
+    job_id: int,
+    candidate_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(require_recruiter_or_admin)
+):
     """Rank a candidate against a job using AI."""
     try:
         logger.info(f"Ranking candidate {candidate_id} for job {job_id}")

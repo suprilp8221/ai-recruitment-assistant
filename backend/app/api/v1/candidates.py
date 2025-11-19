@@ -3,12 +3,13 @@ import os
 from fastapi import APIRouter, Depends, UploadFile, File, Form, BackgroundTasks, HTTPException
 from sqlalchemy.orm import Session
 from app.db.database import get_db, SessionLocal
-from app.db import crud
+from app.db import crud, models
 from app import schemas
 from app.services import resume_parser
 from app.core.exceptions import CandidateNotFoundException, ResumeParsingException, DatabaseException
 from app.core.security import validate_resume_file, sanitize_filename
 from app.core.logging_config import get_logger
+from app.core.auth_dependencies import get_current_user, require_recruiter_or_admin
 from uuid import uuid4
 from typing import List
 
@@ -26,7 +27,8 @@ async def upload_candidate(
     name: str = Form(...),
     email: str = Form(None),
     phone: str = Form(None),
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
+    current_user: models.User = Depends(require_recruiter_or_admin)
 ):
     """
     Upload resume file (pdf/docx) with candidate basic info.
@@ -110,7 +112,12 @@ def process_resume_background(candidate_id: int, file_path: str):
         db.close()
 
 @router.get("/candidates", response_model=List[schemas.CandidateOut])
-def get_candidates(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def get_candidates(
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
     """List all candidates."""
     try:
         logger.debug(f"Listing candidates: skip={skip}, limit={limit}")
@@ -122,7 +129,11 @@ def get_candidates(skip: int = 0, limit: int = 100, db: Session = Depends(get_db
         raise DatabaseException("list_candidates", str(e))
 
 @router.get("/candidates/{candidate_id}", response_model=schemas.CandidateOut)
-def get_candidate(candidate_id: int, db: Session = Depends(get_db)):
+def get_candidate(
+    candidate_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
     """Get a specific candidate by ID."""
     try:
         logger.debug(f"Fetching candidate: {candidate_id}")

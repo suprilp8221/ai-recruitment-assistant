@@ -14,7 +14,9 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), nullable=False)
     email = Column(String(255), unique=True, nullable=False, index=True)
-    is_admin = Column(Boolean, default=False)
+    password_hash = Column(String(255), nullable=False)
+    role = Column(String(50), default="recruiter")  # admin, recruiter, interviewer
+    is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=now)
 
 class Candidate(Base):

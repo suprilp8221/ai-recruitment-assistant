@@ -30,6 +30,23 @@
                     <button onclick="showSection('ranking')" class="nav-btn px-4 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
                         <i class="fas fa-star mr-2"></i>Ranking
                     </button>
+                    <div class="relative">
+                        <button id="user-menu-button" class="flex items-center px-4 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+                            <i class="fas fa-user-circle mr-2"></i>
+                            <span id="user-name">User</span>
+                            <i class="fas fa-chevron-down ml-2"></i>
+                        </button>
+                        <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                            <div class="px-4 py-2 border-b">
+                                <p class="text-sm text-gray-600">Signed in as</p>
+                                <p class="text-sm font-semibold" id="user-email">user@example.com</p>
+                                <p class="text-xs text-gray-500 mt-1" id="user-role">Role: Recruiter</p>
+                            </div>
+                            <button onclick="logout()" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -155,9 +172,14 @@
                     <h1 class="text-3xl font-bold text-gray-800 mb-2">Interviews</h1>
                     <p class="text-gray-600">Schedule and manage interviews</p>
                 </div>
-                <button onclick="showInterviewModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg shadow-md transition flex items-center">
-                    <i class="fas fa-calendar-plus mr-2"></i>Schedule Interview
-                </button>
+                <div class="flex gap-3">
+                    <button onclick="showQuestionsModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg shadow-md transition flex items-center">
+                        <i class="fas fa-magic mr-2"></i>Generate Questions
+                    </button>
+                    <button onclick="showInterviewModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg shadow-md transition flex items-center">
+                        <i class="fas fa-calendar-plus mr-2"></i>Schedule Interview
+                    </button>
+                </div>
             </div>
 
             <!-- Filter Tabs -->
@@ -214,6 +236,77 @@
     </main>
 
     <!-- Modals -->
+    <!-- Generate Questions Modal -->
+    <div id="questions-modal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gray-800">
+                        <i class="fas fa-magic text-purple-600 mr-2"></i>AI Interview Questions Generator
+                    </h2>
+                    <button onclick="closeQuestionsModal()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <!-- Selection Form -->
+                <div id="questions-form-section" class="mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Select Job *</label>
+                            <select id="questions-job-select" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                                <option value="">Choose a job...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Select Candidate *</label>
+                            <select id="questions-candidate-select" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                                <option value="">Choose a candidate...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Number of Questions</label>
+                            <input type="number" id="questions-count" value="10" min="5" max="20" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Difficulty Level</label>
+                            <select id="questions-difficulty" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                                <option value="easy">Easy (Junior)</option>
+                                <option value="medium" selected>Medium (Mid-level)</option>
+                                <option value="hard">Hard (Senior)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button onclick="generateQuestions()" class="w-full bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg shadow-md transition">
+                        <i class="fas fa-magic mr-2"></i>Generate Questions
+                    </button>
+                </div>
+
+                <!-- Generated Questions Display -->
+                <div id="questions-result-section" class="hidden">
+                    <div class="mb-4 flex justify-between items-center">
+                        <h3 class="text-xl font-bold text-gray-800" id="questions-result-title"></h3>
+                        <div class="space-x-2">
+                            <button onclick="copyQuestionsToClipboard()" class="text-blue-600 hover:text-blue-700 px-3 py-1 border border-blue-600 rounded hover:bg-blue-50">
+                                <i class="fas fa-copy mr-1"></i>Copy All
+                            </button>
+                            <button onclick="resetQuestionsForm()" class="text-gray-600 hover:text-gray-700 px-3 py-1 border border-gray-300 rounded hover:bg-gray-50">
+                                <i class="fas fa-redo mr-1"></i>Generate New
+                            </button>
+                        </div>
+                    </div>
+                    <div id="questions-content" class="space-y-4">
+                        <!-- Questions will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Upload Resume Modal -->
     <div id="upload-modal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
@@ -357,6 +450,275 @@
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analyze Feedback Modal -->
+    <div id="feedback-modal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gray-800">
+                        <i class="fas fa-chart-line text-blue-600 mr-2"></i>Analyze Interview Feedback
+                    </h2>
+                    <button onclick="closeFeedbackModal()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <!-- Input Section -->
+                <div id="feedback-input-section">
+                    <div class="mb-4">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2" id="feedback-interview-title"></h3>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 font-medium mb-2">Interview Notes/Feedback *</label>
+                        <textarea id="feedback-notes" rows="8" required
+                                  placeholder="Enter detailed interview notes, observations, and feedback here..."
+                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
+                        <p class="text-sm text-gray-500 mt-1">Provide as much detail as possible for better AI analysis</p>
+                    </div>
+                    <button onclick="analyzeFeedback()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg shadow-md transition">
+                        <i class="fas fa-magic mr-2"></i>Analyze with AI
+                    </button>
+                </div>
+
+                <!-- Analysis Results Section -->
+                <div id="feedback-results-section" class="hidden">
+                    <div class="mb-6">
+                        <!-- Recommendation Badge -->
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold text-gray-800">Analysis Results</h3>
+                            <div id="feedback-recommendation-badge" class="px-4 py-2 rounded-lg font-bold text-white">
+                                <!-- Will be populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Confidence Score -->
+                        <div class="mb-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-gray-700 font-medium">Confidence Score</span>
+                                <span id="feedback-confidence-value" class="font-bold text-lg"></span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-3">
+                                <div id="feedback-confidence-bar" class="bg-blue-600 h-3 rounded-full transition-all"></div>
+                            </div>
+                        </div>
+
+                        <!-- Skills Ratings -->
+                        <div class="grid grid-cols-3 gap-4 mb-6">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="text-sm text-gray-600 mb-1">Technical Skills</div>
+                                <div id="feedback-technical-rating" class="text-2xl font-bold text-blue-600">-</div>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="text-sm text-gray-600 mb-1">Communication</div>
+                                <div id="feedback-communication-rating" class="text-2xl font-bold text-green-600">-</div>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="text-sm text-gray-600 mb-1">Culture Fit</div>
+                                <div id="feedback-culture-rating" class="text-2xl font-bold text-purple-600">-</div>
+                            </div>
+                        </div>
+
+                        <!-- Strengths -->
+                        <div class="mb-6">
+                            <h4 class="text-lg font-semibold text-green-700 mb-3 flex items-center">
+                                <i class="fas fa-check-circle mr-2"></i>Key Strengths
+                            </h4>
+                            <ul id="feedback-strengths-list" class="space-y-2">
+                                <!-- Will be populated dynamically -->
+                            </ul>
+                        </div>
+
+                        <!-- Weaknesses -->
+                        <div class="mb-6">
+                            <h4 class="text-lg font-semibold text-orange-700 mb-3 flex items-center">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>Areas of Concern
+                            </h4>
+                            <ul id="feedback-weaknesses-list" class="space-y-2">
+                                <!-- Will be populated dynamically -->
+                            </ul>
+                        </div>
+
+                        <!-- Overall Assessment -->
+                        <div class="mb-6 bg-blue-50 p-4 rounded-lg">
+                            <h4 class="text-lg font-semibold text-blue-800 mb-2">Overall Assessment</h4>
+                            <p id="feedback-overall-assessment" class="text-gray-700"></p>
+                        </div>
+
+                        <!-- Reasoning -->
+                        <div class="mb-6">
+                            <h4 class="text-lg font-semibold text-gray-800 mb-2">Recommendation Reasoning</h4>
+                            <p id="feedback-reasoning" class="text-gray-700"></p>
+                        </div>
+
+                        <!-- Next Steps -->
+                        <div class="mb-6">
+                            <h4 class="text-lg font-semibold text-indigo-700 mb-3 flex items-center">
+                                <i class="fas fa-arrow-right mr-2"></i>Suggested Next Steps
+                            </h4>
+                            <ol id="feedback-next-steps-list" class="space-y-2 list-decimal list-inside">
+                                <!-- Will be populated dynamically -->
+                            </ol>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex gap-3">
+                            <button onclick="resetFeedbackForm()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-lg transition">
+                                <i class="fas fa-redo mr-2"></i>Analyze Again
+                            </button>
+                            <button onclick="closeFeedbackModal()" class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resume Optimizer Modal -->
+    <div id="optimizer-modal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-5xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gray-800">
+                        <i class="fas fa-file-alt text-green-600 mr-2"></i>Resume ATS Optimizer
+                    </h2>
+                    <button onclick="closeOptimizerModal()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <!-- Loading State -->
+                <div id="optimizer-loading" class="text-center py-12">
+                    <i class="fas fa-spinner fa-spin text-blue-600 text-5xl mb-4"></i>
+                    <p class="text-gray-600 text-lg">Analyzing resume for ATS compatibility...</p>
+                </div>
+
+                <!-- Results Section -->
+                <div id="optimizer-results" class="hidden">
+                    <!-- ATS Score -->
+                    <div class="bg-gradient-to-r from-blue-50 to-green-50 rounded-lg p-6 mb-6 text-center">
+                        <h3 class="text-gray-700 text-lg mb-2">Overall ATS Score</h3>
+                        <div class="relative inline-flex items-center justify-center">
+                            <svg class="transform -rotate-90 w-32 h-32">
+                                <circle cx="64" cy="64" r="56" stroke="#e5e7eb" stroke-width="8" fill="none" />
+                                <circle id="ats-score-circle" cx="64" cy="64" r="56" stroke="#10b981" stroke-width="8" fill="none" 
+                                    stroke-dasharray="351.86" stroke-dashoffset="0" stroke-linecap="round" />
+                            </svg>
+                            <div class="absolute text-center">
+                                <span id="ats-score-value" class="text-4xl font-bold text-gray-800">0</span>
+                                <span class="text-gray-500 text-sm">/100</span>
+                            </div>
+                        </div>
+                        <p id="ats-score-label" class="text-gray-600 mt-2"></p>
+                    </div>
+
+                    <!-- Score Breakdown -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                            <i class="fas fa-chart-bar text-blue-600 mr-2"></i>Score Breakdown
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                            <div class="text-center">
+                                <div class="text-sm text-gray-600 mb-1">Keywords</div>
+                                <div class="text-2xl font-bold text-blue-600" id="score-keywords">0</div>
+                                <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                                    <div id="bar-keywords" class="bg-blue-600 h-2 rounded-full" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-sm text-gray-600 mb-1">Formatting</div>
+                                <div class="text-2xl font-bold text-green-600" id="score-formatting">0</div>
+                                <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                                    <div id="bar-formatting" class="bg-green-600 h-2 rounded-full" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-sm text-gray-600 mb-1">Structure</div>
+                                <div class="text-2xl font-bold text-purple-600" id="score-structure">0</div>
+                                <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                                    <div id="bar-structure" class="bg-purple-600 h-2 rounded-full" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-sm text-gray-600 mb-1">Completeness</div>
+                                <div class="text-2xl font-bold text-yellow-600" id="score-completeness">0</div>
+                                <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                                    <div id="bar-completeness" class="bg-yellow-600 h-2 rounded-full" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-sm text-gray-600 mb-1">Relevance</div>
+                                <div class="text-2xl font-bold text-red-600" id="score-relevance">0</div>
+                                <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                                    <div id="bar-relevance" class="bg-red-600 h-2 rounded-full" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Two Column Layout -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Left Column -->
+                        <div>
+                            <!-- Recommended Keywords -->
+                            <div class="mb-6">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-3">
+                                    <i class="fas fa-tags text-blue-600 mr-2"></i>Recommended Keywords
+                                </h3>
+                                <div id="recommended-keywords" class="space-y-2"></div>
+                            </div>
+
+                            <!-- Strengths -->
+                            <div class="mb-6">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-3">
+                                    <i class="fas fa-check-circle text-green-600 mr-2"></i>Strengths
+                                </h3>
+                                <ul id="resume-strengths" class="space-y-2"></ul>
+                            </div>
+                        </div>
+
+                        <!-- Right Column -->
+                        <div>
+                            <!-- Formatting Issues -->
+                            <div class="mb-6">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-3">
+                                    <i class="fas fa-exclamation-triangle text-orange-600 mr-2"></i>Formatting Issues
+                                </h3>
+                                <ul id="formatting-issues" class="space-y-2"></ul>
+                            </div>
+
+                            <!-- Improvement Suggestions -->
+                            <div class="mb-6">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-3">
+                                    <i class="fas fa-lightbulb text-yellow-600 mr-2"></i>Top Improvements
+                                </h3>
+                                <div id="improvement-suggestions" class="space-y-3"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Overall Feedback -->
+                    <div class="bg-blue-50 rounded-lg p-4 mb-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                            <i class="fas fa-comment-alt text-blue-600 mr-2"></i>Overall Assessment
+                        </h3>
+                        <p id="overall-feedback" class="text-gray-700"></p>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex gap-3">
+                        <button onclick="closeOptimizerModal()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition">
+                            <i class="fas fa-check mr-2"></i>Done
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
